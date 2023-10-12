@@ -160,3 +160,7 @@ cython_debug/
 #.idea/
 
 .vscode
+tmp
+
+alembic.ini
+config.py
