@@ -9,3 +9,6 @@ db:
 
 migrate:
 	alembic upgrade head
+
+test:
+	pytest
