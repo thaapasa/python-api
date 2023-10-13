@@ -1,7 +1,6 @@
-import asyncpg
-
 from typing import Union
 from config import DATABASE_URL
+from db import init_pool, close_pool, get_transaction
 
 from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
@@ -10,26 +9,17 @@ from sqlalchemy.orm import Session
 from contextlib import asynccontextmanager
 
 
-pool = None
 app = FastAPI()
-
-
-async def get_transaction() -> asyncpg.Connection:
-    async with pool.acquire() as connection:
-        async with connection.transaction():
-            yield connection
 
 
 @app.on_event("startup")
 async def startup_event():
-    global pool
-    pool = await asyncpg.create_pool(DATABASE_URL)
+    await init_pool()
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    global pool
-    await pool.close()
+    await close_pool()
 
 
 class Item(BaseModel):
