@@ -2,7 +2,7 @@ from config import DATABASE_URL
 from db import init_pool, close_pool
 
 from fastapi import FastAPI
-from api.items_api import add_item_routes
+from api.items_api import get_item_routes
 
 
 app = FastAPI()
@@ -23,4 +23,4 @@ def read_root():
     return {"Hello": "World", "sub": {"dada": 1010}, "missing": None}
 
 
-add_item_routes(app)
+app.mount("/items", get_item_routes())
