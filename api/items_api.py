@@ -19,6 +19,13 @@ def get_item_routes():
         print("Found items", items)
         return {"items": items, "status": "ok"}
 
+    @app.get("/foo")
+    def get_foo():
+        item1 = Item(name="athing", price=233.23, is_offer=True)
+        item2 = Item(**{"name": "another", "price": 432})
+        item3 = Item.model_validate({"name": "validated", "price": 53.24})
+        return {"items": [item1, item2, item3]}
+
     @app.get("/{item_id}")
     async def read_item(
         item_id: int, q: Union[str, None] = None, tx=Depends(get_transaction)
@@ -44,6 +51,7 @@ def get_item_routes():
 
     @app.post("/")
     async def update_item(item: Item, tx=Depends(get_transaction)):
+        """Insert a new item"""
         item = await tx.fetchrow(
             "INSERT INTO items (name, price) VALUES ($1, $2) RETURNING *",
             item.name,
