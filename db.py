@@ -2,7 +2,7 @@ import asyncpg
 
 from config import DATABASE_URL
 
-pool = None
+pool: asyncpg.Pool = None
 
 
 async def get_transaction() -> asyncpg.Connection:
