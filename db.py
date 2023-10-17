@@ -9,15 +9,13 @@ from config import DATABASE_URL
 
 
 @asynccontextmanager
-async def setup_app_db_pool(_app: FastAPI):
+async def create_db_pool():
     async with asyncpg.create_pool(DATABASE_URL) as pool:
-        _app.state.db_pool = pool
-        yield
-        _app.state.db_pool = None
+        yield pool
 
 
 def get_request_db_pool(request: Request) -> asyncpg.Pool:
-    return request.app.state.db_pool
+    return request.state.db_pool
 
 
 GetRequestDbPool = Annotated[asyncpg.Pool, Depends(get_request_db_pool)]

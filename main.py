@@ -1,18 +1,24 @@
 from contextlib import asynccontextmanager
+from typing import AsyncIterator, TypedDict
 
+import asyncpg
 from fastapi import FastAPI
 
 from api.items_api import get_item_routes
-from db import setup_app_db_pool
+from db import create_db_pool
+
+
+class AppContext(TypedDict):
+    db_pool: asyncpg.Pool
 
 
 @asynccontextmanager
-async def bootstrap(_app: FastAPI):
-    async with setup_app_db_pool(_app):
-        yield
+async def lifespan(_app: FastAPI) -> AsyncIterator[AppContext]:
+    async with create_db_pool() as db_pool:
+        yield {"db_pool": db_pool}
 
 
-app = FastAPI(lifespan=bootstrap)
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/")
