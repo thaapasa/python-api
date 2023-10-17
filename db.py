@@ -1,21 +1,32 @@
+from contextlib import asynccontextmanager
+from typing import Annotated
+
 import asyncpg
+from fastapi import FastAPI, Depends
+from starlette.requests import Request
 
 from config import DATABASE_URL
 
-pool: asyncpg.Pool = None
+
+@asynccontextmanager
+async def setup_app_db_pool(_app: FastAPI):
+    async with asyncpg.create_pool(DATABASE_URL) as pool:
+        _app.state.db_pool = pool
+        yield
+        _app.state.db_pool = None
 
 
-async def get_transaction() -> asyncpg.Connection:
-    async with pool.acquire() as connection:
-        async with connection.transaction():
-            yield connection
+def get_request_db_pool(request: Request) -> asyncpg.Pool:
+    return request.app.state.db_pool
 
 
-async def init_pool():
-    global pool
-    pool = await asyncpg.create_pool(DATABASE_URL)
+GetRequestDbPool = Annotated[asyncpg.Pool, Depends(get_request_db_pool)]
 
 
-async def close_pool():
-    global pool
-    await pool.close()
+async def wrap_request_in_transaction(pool: GetRequestDbPool) -> asyncpg.Connection:
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            yield conn
+
+
+ReqTx = Annotated[asyncpg.Connection, Depends(wrap_request_in_transaction)]

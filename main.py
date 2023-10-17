@@ -1,21 +1,18 @@
-from config import DATABASE_URL
-from db import init_pool, close_pool
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+
 from api.items_api import get_item_routes
+from db import setup_app_db_pool
 
 
-app = FastAPI()
+@asynccontextmanager
+async def bootstrap(_app: FastAPI):
+    async with setup_app_db_pool(_app):
+        yield
 
 
-@app.on_event("startup")
-async def startup_event():
-    await init_pool()
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    await close_pool()
+app = FastAPI(lifespan=bootstrap)
 
 
 @app.get("/")
@@ -23,4 +20,4 @@ def read_root():
     return {"Hello": "World", "sub": {"dada": 1010}, "missing": None}
 
 
-app.mount("/items", get_item_routes())
+app.include_router(get_item_routes())

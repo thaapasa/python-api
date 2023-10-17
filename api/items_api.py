@@ -1,34 +1,37 @@
-from fastapi import FastAPI
 from typing import Union
-from db import get_transaction
-from data.items import Item
 
-from fastapi import HTTPException, Depends
+from fastapi import APIRouter
+from fastapi import HTTPException
+
+from data.items import Item
+from db import ReqTx
 
 
 def get_item_routes():
     """Add routes for the /items subpath"""
 
-    app = FastAPI()
+    router = APIRouter(prefix="/items")
 
-    @app.get("/")
-    async def read_item(tx=Depends(get_transaction)):
+    @router.get("/")
+    async def read_item(tx: ReqTx):
         items = await tx.fetch(
             "SELECT * FROM items",
         )
         print("Found items", items)
         return {"items": items, "status": "ok"}
 
-    @app.get("/foo")
+    @router.get("/foo")
     def get_foo():
         item1 = Item(name="athing", price=233.23, is_offer=True)
         item2 = Item(**{"name": "another", "price": 432})
         item3 = Item.model_validate({"name": "validated", "price": 53.24})
         return {"items": [item1, item2, item3]}
 
-    @app.get("/{item_id}")
+    @router.get("/{item_id}")
     async def read_item(
-        item_id: int, q: Union[str, None] = None, tx=Depends(get_transaction)
+        tx: ReqTx,
+        item_id: int,
+        q: Union[str, None] = None,
     ):
         item = await tx.fetchrow("SELECT * FROM items WHERE id=$1", item_id)
         if item is None:
@@ -36,8 +39,8 @@ def get_item_routes():
         print("Found item", item)
         return {"item": item, "status": "ok", "q": q}
 
-    @app.put("/{item_id}")
-    async def update_item(item_id: int, item: Item, tx=Depends(get_transaction)):
+    @router.put("/{item_id}")
+    async def update_item(tx: ReqTx, item_id: int, item: Item):
         item = await tx.fetchrow(
             "UPDATE items SET name=$2, price=$3 WHERE id=$1 RETURNING *",
             item_id,
@@ -49,8 +52,8 @@ def get_item_routes():
         print("Updated item", item)
         return {"status": "ok", "item": item}
 
-    @app.post("/")
-    async def update_item(item: Item, tx=Depends(get_transaction)):
+    @router.post("/")
+    async def update_item(tx: ReqTx, item: Item):
         """Insert a new item"""
         item = await tx.fetchrow(
             "INSERT INTO items (name, price) VALUES ($1, $2) RETURNING *",
@@ -60,8 +63,8 @@ def get_item_routes():
         print("Inserted item", item)
         return {"status": "ok", "item": item}
 
-    @app.delete("/{item_id}")
-    async def delete_item(item_id: int, tx=Depends(get_transaction)):
+    @router.delete("/{item_id}")
+    async def delete_item(tx: ReqTx, item_id: int):
         item = await tx.fetchrow(
             "DELETE FROM items WHERE id=$1 RETURNING *",
             item_id,
@@ -71,4 +74,4 @@ def get_item_routes():
         print("Deleted item", item)
         return {"status": "ok", "deleted": item}
 
-    return app
+    return router
