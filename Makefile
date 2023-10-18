@@ -1,6 +1,10 @@
 .ONESHELL:
 
-.PHONY: .venv
+
+.venv:
+	python -m venv .venv
+
+.PHONY: venv
 venv:
 	. .venv/bin/activate
 
@@ -30,3 +34,7 @@ test: venv
 
 requirements.txt: venv
 	pip freeze >requirements.txt
+
+.PHONE: install
+install: venv
+	pip install -r requirements.txt
