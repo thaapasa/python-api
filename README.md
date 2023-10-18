@@ -31,3 +31,24 @@ poetry install
 # or
 make install
 ```
+
+Then, create local copies of config templates:
+
+```bash
+cp alembic.ini.tmpl alembic.ini
+cp config.py.tmpl config.py
+```
+
+Adjust settings (such as database URL) as needed.
+
+You can create the database with:
+
+```bash
+make db
+```
+
+## Add new DB migration
+
+```bash
+poetry rub alembic revision -m "Revision information"
+```
