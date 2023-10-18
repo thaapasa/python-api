@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from typing import Annotated
 
 import asyncpg
-from fastapi import FastAPI, Depends
+from fastapi import Depends
 from starlette.requests import Request
 
 from config import DATABASE_URL

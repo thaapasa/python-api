@@ -1,10 +1,10 @@
 .PHONY: start
 start:
-	poetry run uvicorn main:app --reload
+	poetry run uvicorn server.main:app --reload
 
 .PHONY: lint
 lint:
-	poetry run mypy main.py
+	poetry run mypy server/main.py
 
 .PHONY: db
 db: venv

@@ -3,7 +3,7 @@ import pytest_asyncio
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient
 
-from main import app
+from server.main import app
 
 
 @pytest_asyncio.fixture

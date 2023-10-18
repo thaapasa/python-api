@@ -3,8 +3,8 @@ from typing import Union
 from fastapi import APIRouter
 from fastapi import HTTPException
 
-from data.items import Item
-from db import ReqTx
+from server.data.items import Item
+from server.db import ReqTx
 
 
 def get_item_routes():

@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from main import app
+from server.main import app
 
 
 def test_add_item():

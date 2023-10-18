@@ -1,4 +1,4 @@
-from data.items import Item
+from server.data.items import Item
 
 
 def test_create_item():

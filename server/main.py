@@ -4,8 +4,8 @@ from typing import AsyncIterator, TypedDict
 import asyncpg
 from fastapi import FastAPI
 
-from api.items_api import get_item_routes
-from db import create_db_pool
+from server.api.items_api import get_item_routes
+from server.db import create_db_pool
 
 
 class AppContext(TypedDict):
