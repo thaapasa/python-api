@@ -12,6 +12,9 @@ class AppContext(TypedDict):
     db_pool: asyncpg.Pool
 
 
+# The state returned from here is the lifespan state that is
+# automatically included in each request
+# See: https://asgi.readthedocs.io/en/latest/specs/lifespan.html#lifespan-state
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[AppContext]:
     async with create_db_pool() as db_pool:

@@ -4,7 +4,8 @@ start:
 
 .PHONY: lint
 lint:
-	poetry run mypy server/main.py
+	poetry run mypy server
+	poetry run mypy tests
 
 .PHONY: db
 db: venv

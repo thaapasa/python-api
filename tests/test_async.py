@@ -5,6 +5,14 @@ from httpx import AsyncClient
 
 from server.main import app
 
+# For async tests, see: https://fastapi.tiangolo.com/advanced/async-tests/
+# Note that AsyncClient does not initialize the app state (lifespan events
+# are not run).
+# See the note in: https://www.python-httpx.org/async/
+# Therefore we also need the LifespanManager to run the lifespan
+# initialization.
+# See: https://github.com/florimondmanca/asgi-lifespan#usage
+
 
 @pytest_asyncio.fixture
 async def client():
