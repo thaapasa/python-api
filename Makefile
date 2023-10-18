@@ -1,40 +1,27 @@
-.ONESHELL:
-
-
-.venv:
-	python -m venv .venv
-
-.PHONY: venv
-venv:
-	. .venv/bin/activate
-
 .PHONY: start
-start: venv
-	uvicorn main:app --reload
+start:
+	poetry run uvicorn main:app --reload
 
 .PHONY: lint
-lint: venv
-	mypy main.py
+lint:
+	poetry run mypy main.py
 
 .PHONY: db
 db: venv
 	docker run -e POSTGRES_PASSWORD=postgres -p 5532:5432 --name borkapi-db -d postgres:16.0
 
 .PHONY: migrate
-migrate: venv
-	alembic upgrade head
+migrate:
+	poetry run alembic upgrade head
 
 .PHONY: rollback
-rollback: venv
-	alembic downgrade -1
+rollback:
+	poetry run alembic downgrade -1
 
 .PHONY: test
-test: venv
-	pytest
-
-requirements.txt: venv
-	pip freeze >requirements.txt
+test:
+	poetry run pytest
 
 .PHONE: install
-install: venv
-	pip install -r requirements.txt
+install:
+	poetry install
